@@ -1,0 +1,161 @@
+#!/usr/bin/env python
+import sys
+
+from PyQt5 import QtWidgets 
+from PyQt5 import QtGui 
+from PyQt5.QtCore import pyqtSlot
+
+import yaml
+from igm.core import defaults
+import os
+
+from igm.ui.viewer_header import HeaderWorkspaceGroup
+from igm.ui.viewer_tabs import ConfigTableWidget
+
+class IGMGUI(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.title = "IGM - View"
+        self.left, self.top = 100, 100
+        self.width, self.height = 640, 480
+        
+        self.initUI()
+        
+        self.initMenu()
+        
+        self.initMainObject()
+        
+        self.show()
+        
+    def initUI(self):
+        self.setWindowTitle(self.title)
+        self.setGeometry(self.left, self.top, self.width, self.height)
+        self.statusBar().showMessage("Ready")
+        
+    def initMenu(self):
+        self.mainMenu = self.menuBar()
+        self.fileMenu = self.mainMenu.addMenu('File')
+        self.toolsMenu = self.mainMenu.addMenu('Tools')
+        self.helpMenu = self.mainMenu.addMenu('Help')
+        
+        newButton = QtWidgets.QAction(QtGui.QIcon(), ' Open..', self)
+        newButton.setShortcut('Ctrl+O')
+        newButton.setStatusTip('Open IGM workspace')
+        newButton.triggered.connect(self._open_workspace)
+        self.fileMenu.addAction(newButton)
+        
+        exitButton = QtWidgets.QAction(QtGui.QIcon(), ' Exit', self)
+        exitButton.setShortcut('Ctrl+Q')
+        exitButton.setStatusTip('Exit application')
+        exitButton.triggered.connect(self.close)
+        self.fileMenu.addAction(exitButton)
+    
+    def _getDirectoryDialog(self):
+       
+        dname = QtWidgets.QFileDialog.getExistingDirectory(self, "Select Directory",
+                                                           os.path.expanduser("~"),
+                                                           QtWidgets.QFileDialog.ShowDirsOnly
+                                                          )
+        if dname:
+            return dname
+        else:
+            return None
+            
+    def _open_workspace(self):
+        d = self._getDirectoryDialog()
+        if d:
+            p = os.path.abspath(d)
+            p = os.path.realpath(p)
+            if os.path.exists(p):
+                print("Open workspace:", p)
+                self.MainObject.updateWorkspace(p)
+            else:
+                print("Invalid workspace", p)
+        else:
+            print("Not selected")
+            
+    def initMainObject(self):
+        self.MainObject = IGMMainObject(self)
+        
+        self.setCentralWidget(self.MainObject)
+        
+class IGMMainObject(QtWidgets.QWidget):
+    def __init__(self, parent):
+        super(QtWidgets.QWidget, self).__init__(parent)     
+        #Setup layout
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.setContentsMargins(5, 5, 5, 5)
+        self.setLayout(layout)
+        
+        #Header section
+        self.header_widget = MainHeaderWidget(self)
+        layout.addWidget(self.header_widget)
+        
+        #Main Tab section
+        self.table_widget = MainTableWidget(self)
+        layout.addWidget(self.table_widget)
+        
+        self.show()
+    def updateWorkspace(self, label):
+        self.header_widget.updateWorkspace(label)
+        
+class MainHeaderWidget(QtWidgets.QWidget):
+    def __init__(self, parent):
+        super(QtWidgets.QWidget, self).__init__(parent)
+        #Setup Layout
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.setContentsMargins(5, 5, 5, 5)
+        self.setLayout(layout)
+        
+        #Display workspace group
+        self.workspace_group = HeaderWorkspaceGroup("Workspace:", self)
+        layout.addWidget(self.workspace_group)
+        
+        self.show()
+    
+    def updateWorkspace(self, path):
+        self.workspace_group.updateWorkspace(path)
+        
+
+class MainTableWidget(QtWidgets.QWidget):
+    def __init__(self, parent):
+        super(QtWidgets.QWidget, self).__init__(parent)      
+        
+        #Setup layout
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(layout)
+        
+        # Initialize tab screen
+        self.main_tabs = QtWidgets.QTabWidget(self)
+        # Create first tab
+        self.main_tab_config = ConfigTableWidget(self, defaults.schema)
+        self.main_tab_monitor = QtWidgets.QWidget(self)
+        
+        #self.main_tabs.resize(width, height)
+        
+        # Add tabs
+        self.main_tabs.addTab(self.main_tab_config,"Config")
+        self.main_tabs.addTab(self.main_tab_monitor,"Monitor")
+        
+
+        # Add tabs to layout
+        layout.addWidget(self.main_tabs)
+
+        self.show()
+    @pyqtSlot()
+    def on_click(self):
+        print("\n")
+        for currentQTableWidgetItem in self.tableWidget.selectedItems():
+            print(currentQTableWidgetItem.row(), currentQTableWidgetItem.column(), currentQTableWidgetItem.text())
+
+
+
+if __name__ == '__main__':
+
+    app = QtWidgets.QApplication(sys.argv)
+    window = IGMGUI()
+    window.show()
+    sys.exit(app.exec_())
+    
+    

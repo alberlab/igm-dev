@@ -1,0 +1,205 @@
+# This file defines the main option schema for IGM
+Module: Core
+
+# =============================================================
+# =                  Genome Specifications                    =
+# =============================================================
+Genome:
+    label: Genome Specifications
+    role: group
+    tip: Genome Specifications
+    
+    assembly:
+        label: Genome Assembly
+        role: line
+        dtype: [str]
+        
+        default: hg38
+        tip: Genome Assembly
+        description: >
+            The genome assembly. Can be a string for an available assembly (mm9, hg19, hg38, etc) or 
+            the path of an hdf5 file containing genomic information (see alabtools.Genome objects).
+    
+    ploidy:
+        label: Ploidy
+        role: line
+        dtype: [dict, str]
+        
+        default: diploid
+        tip: "Genome ploidy, valid candidates: haploid, diploid, male, dictionary of chromosome."
+        description: >
+            This parameter controls the number of copies for each chromosome. Valid values are `haploid`, `diploid`, `male` 
+            (two copies for each autosome, one X and one Y), or a dictionary of chromosome, number of copies pairs. 
+        
+    usechr:
+        label: Chromosomes considered
+        role: line
+        dtype: [str]
+        
+        default: "['#', 'X', 'Y']"
+        tip: A list of chromosomes used in the modeling
+        description: >
+            "A list of chromosomes used in the modeling. The character `#` is a shortcut for autosomes. Can be strings or a genome"
+        
+    segmentation:
+        label: Genome segmentation
+        role: line
+        dtype: [int, path]
+        
+        default: 200000
+        tip: The segmentation of genome chromatin, each segment will be represented as one bead.
+        description: >
+            The genome segmentation. Each segment will be represented by one bead. Can be a bed file or an hdf5 file 
+            containing a genomic index. If the genome assembly is specified and recognized, it can also be an integer
+            number of basepairs N; in this case, the genome will be split in regions as size N.
+
+# =============================================================
+# =                     Model Parameters                      =
+# =============================================================
+Model:
+    label: Model parameters
+    role: group
+    tip: Model parameters
+    
+    population_size:
+        label: Number of structures
+        role: line
+        dtype: [int]
+        
+        default: 10000
+        min: 10
+        tip: Number of structures in the population
+        description: >
+            Number of structures in the population.
+    
+    starting_coordinates:
+        label: Initial coordinates
+        role: line
+        dtype: [path]
+        
+        default: ""
+        tip: Initial coordinates, leave blank for random initialization
+        description: >
+            An hss file with the starting coordinates. If not specified, a random polymer model with territories will be 
+            generated as a starting point.
+            
+    occupancy:
+        label: Volume occupancy
+        role: line
+        dtype: [float]
+        
+        default: 0.2
+        tip: Genome occupancy in nucleus volume
+        description: >
+            Fraction of volume occupied by the hard core of the beads.
+
+
+# =============================================================
+# =                  Data independent restraints              =
+# =============================================================
+PrimeRestraints:
+    label: Prime model restraints
+    role: group
+    tip: Data independent restraints
+    
+    excluded:
+        label: Excluded volume restraint
+        role: group
+        tip: Chromatin bead excluded volume restraint
+        
+        evfactor:
+            label: Scale factor
+            role: line
+            dtype: [float]
+        
+            default: 1.0
+            tip: Scale factor for excluded volume
+            description: >
+                Scale excluded volume interactions. Smaller values correspond to weaker interactions.
+        
+    
+    envelope:
+        label: Nucleus envelope restraint
+        role: group
+        tip: Nucleus envelope restraint
+        
+        nucleus_shape:
+            label: Nucleus shape
+            role: select
+            dtype: [str]
+                
+            candidates: [sphere, ellipsoid]
+            default: sphere
+            tip: Ths shape of the nuclues
+            description: >
+                The shape of the nucleus.
+            
+            
+        nucleus_axes:
+            label: Nucleus axes
+            role: line
+            dtype: [float, list]
+            
+            default: 5000.0
+            tip: Nucleus radius if the shape is sphere, semiaxes if the shape is ellipsoid
+            description: >
+                Nucleus radius if the shape is sphere, semiaxes if the shape is ellipsoid.
+            
+        nucleus_kspring:
+            label: Force constant
+            role: line
+            dtype: [float]
+            
+            default: 1.0
+            min: 0.0
+            tip: The shape restraint force constant
+            description: >
+                The force constant for nucleus shape.
+                
+    polymer:
+        label: Polymer restraints
+        role: group
+        tip: Polymer restraints for consecutive beads in the same chromosome
+        
+        contact_range:
+            label: Contact range
+            role: line
+            dtype: [float]
+            
+            default: 2.0
+            min: 1.0
+            tip: The contact range for 2 beads are considered in contact
+            description: >
+                Two beads are considered in contact when their distance is `contact_range` times the sum
+                of their hard-core radiuses.
+            
+        polymer_bonds_style:
+            label: Polymer bond style
+            role: select
+            dtype: [str]
+            
+            candidates: ['simple', 'hic', 'none']
+            default: simple
+            tip: The polymeric bond style to apply.
+            description: >
+                The polymeric bond style to apply. If set to `simple` (the default), successive beads in a 
+                chromosome are restrained to be closer than the `contact_range` distance. If set to `hic`, 
+                it will use Hi-C information to set distances accordingly to the probability values. If set 
+                to `none`, successive bead contacts are not imposed.
+            
+        polymer_kspring:
+            label: Force constant
+            role: line
+            dtype: [float]
+            
+            default: 1.0
+            min: 0.0
+            tip: Polymeric bond restraint force constant
+            description: > 
+                The force constant for polymeric bond.
+            
+            
+            
+            
+            
+    
