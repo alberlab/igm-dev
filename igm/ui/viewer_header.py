@@ -8,6 +8,7 @@ Igm viewer tabs layout definitions
 import yaml
 from PyQt5 import QtWidgets 
 from PyQt5 import QtGui
+import PyQt5.QtCore
 
 class HeaderWorkspaceGroup(QtWidgets.QGroupBox):
     def __init__(self, title, parent):
@@ -51,8 +52,15 @@ class HeaderWorkspaceDisplayScroll(QtWidgets.QScrollArea):
         self.setWidget(content)
         self.setWidgetResizable(True)
         #self.setMinimumWidth(self.content.sizeHint().width())
-        
+        self.setHorizontalScrollBarPolicy(PyQt5.QtCore.Qt.ScrollBarAsNeeded)
+        self.setVerticalScrollBarPolicy(PyQt5.QtCore.Qt.ScrollBarAlwaysOff)
+        #self.setFixedHeight(50)
         self.show()
+    
+    #def eventFilter(self, o, e):
+        #if o and (e.type() == PyQt5.QtCore.QEvent.Resize):
+            #self.setMinimumWidth(self.workspace_text.minimumSizeHint().height() + self.height())
+        #return False
         
     def updateWorkspace(self, path):
         self.workspace_text.setText(path)
