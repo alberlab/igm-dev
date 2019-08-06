@@ -1,0 +1,48 @@
+# This file defines the polymer restraint option schema 
+Module: Polymer
+Root: PrimeRestraints
+# =============================================================
+# =                      Specifications                       =
+# =============================================================
+Defaults:
+    polymer:
+        label: Polymer restraints
+        role: group
+        tip: Polymer restraints for consecutive beads in the same chromosome
+        
+        contact_range:
+            label: Contact range
+            role: line
+            dtype: [float]
+            
+            default: 2.0
+            min: 1.0
+            tip: The contact range for 2 beads are considered in contact
+            description: >
+                Two beads are considered in contact when their distance is `contact_range` times the sum
+                of their hard-core radiuses.
+            
+        polymer_bonds_style:
+            label: Polymer bond style
+            role: select
+            dtype: [str]
+            
+            candidates: ['simple', 'hic', 'none']
+            default: simple
+            tip: The polymeric bond style to apply.
+            description: >
+                The polymeric bond style to apply. If set to `simple` (the default), successive beads in a 
+                chromosome are restrained to be closer than the `contact_range` distance. If set to `hic`, 
+                it will use Hi-C information to set distances accordingly to the probability values. If set 
+                to `none`, successive bead contacts are not imposed.
+            
+        polymer_kspring:
+            label: Force constant
+            role: line
+            dtype: [float]
+            
+            default: 1.0
+            min: 0.0
+            tip: Polymeric bond restraint force constant
+            description: > 
+                The force constant for polymeric bond.

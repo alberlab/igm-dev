@@ -1,0 +1,45 @@
+# This file defines the nuclear envelope option schema 
+Module: NuclearEnvelope
+Root: PrimeRestraints
+# =============================================================
+# =                      Specifications                       =
+# =============================================================
+Defaults:
+    envelope:
+        label: Nucleus envelope restraint
+        role: group
+        tip: Nucleus envelope restraint
+        
+        nucleus_shape:
+            label: Nucleus shape
+            role: select
+            dtype: [str]
+                
+            candidates: [sphere, ellipsoid]
+            default: sphere
+            tip: Ths shape of the nuclues
+            description: >
+                The shape of the nucleus.
+            
+            
+        nucleus_axes:
+            label: Nucleus axes
+            role: line
+            dtype: [float, list]
+            
+            default: 5000.0
+            tip: Nucleus radius if the shape is sphere, semiaxes if the shape is ellipsoid
+            description: >
+                Nucleus radius if the shape is sphere, semiaxes if the shape is ellipsoid.
+            
+        nucleus_kspring:
+            label: Force constant
+            role: line
+            dtype: [float]
+            
+            default: 1.0
+            min: 0.0
+            tip: The shape restraint force constant
+            description: >
+                The force constant for nucleus shape.
+        

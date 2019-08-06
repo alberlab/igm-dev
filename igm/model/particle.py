@@ -19,6 +19,8 @@ class Particles(object):
         return "(Particles):{}".format(self.n)
     __repr__ = __str__
     
+    def __len__(self):
+        return self.n
     #====Particle methods
     def append(self, pos, r, type=0):
         """

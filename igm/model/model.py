@@ -18,8 +18,10 @@ class Model(object):
     
     """
     
-    def __init__(self, uid=0):
-         
+    def __init__(self, cfg, uid=0):
+        
+        self.cfg = cfg
+        
         self.particles = Particles()
         
         self.restraints = []
@@ -36,14 +38,13 @@ class Model(object):
         return self.particles.getCoordinates()
     def getRadii(self):
         return self.particles.getRadii()
+        
     #====restraint methods
     def addRestraint(self, res, override=False):
         """
         Add a type of restraint to model
         """
         res._apply_model(self, override)
-        
-        res._apply(self)
     
     def evalRestraint(self, i):
         """
@@ -59,14 +60,17 @@ class Model(object):
         
         return self.restraints[i].getViolationRatio(self.particles)
     #====
-    def optimize(self, cfg):
+    def SetupKernel(self):
+        if cfg['optimization']["kernel"] == "lammps":
+            from .kernel import lammps
+            self.kernel = lammps.LammpsKernel(self, self.cfg, self.id)
+            
+    def optimize(self):
         """
         optimize the model by selected kernel
         """
         
-        if cfg['optimization']["kernel"] == "lammps":
-            from .kernel import lammps
-            return lammps.optimize(self, cfg)
+        self.kernel.optimize()
         #-
     #-
     

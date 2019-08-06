@@ -1,0 +1,23 @@
+# This file defines the excluded volume option schema 
+Module: ExcludedVolume
+Root: PrimeRestraints
+# =============================================================
+# =                      Specifications                       =
+# =============================================================
+Defaults:
+    excluded:
+        label: Excluded volume restraint
+        role: group
+        tip: Chromatin bead excluded volume restraint
+            
+        evfactor:
+            label: Scale factor
+            role: line
+            dtype: [float]
+        
+            default: 1.0
+            tip: Scale factor for excluded volume
+            description: >
+                Scale excluded volume interactions. Smaller values correspond to weaker interactions.
+        
+    
